@@ -8,34 +8,24 @@ RUN apk update \
     && apk add --no-cache \
       bash \
       curl \
-      freetype \
       freetype-dev \
-      icu \
       icu-dev \
       imap-dev \
-      libjpeg-turbo \
       libjpeg-turbo-dev \
-      libmcrypt \
       libmcrypt-dev \
-      libpng \
       libpng-dev \
       libpq \
-      libxml2 \
       libxml2-dev \
       libxslt-dev \
-      libzip \
       libzip-dev \
       mysql-client \
-      oniguruma \
       oniguruma-dev \
-      openldap \
       openldap-dev \
       openssh-client \
       patch \
       postgresql-dev \
       python2 \
       python2-dev \
-      tidyhtml \
       tidyhtml-dev \
     && rm -rf /var/cache/apk/*
 
@@ -90,7 +80,6 @@ USER www-data
 
 ENV HOME /home/www-data
 ENV NVM_DIR $HOME/.nvm
-ENV NODE_VERSION v8.17.0
 ENV PATH ${HOME}/.yarn/bin:${HOME}/.nvm/versions/node/${NODE_VERSION}/bin:${PATH}
 
 # Profile
@@ -101,8 +90,9 @@ RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.bashrc" \
 RUN mkdir -p $NVM_DIR \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 
+ENV NODE_VERSION v8.17.0
+
 RUN source ${NVM_DIR}/nvm.sh \
-    && source ${NVM_DIR}/nvm.sh \
     && nvm install -s ${NODE_VERSION} \
     && nvm alias default ${NODE_VERSION} \
     && nvm use --delete-prefix default
