@@ -3,12 +3,14 @@ FROM php:7.4.16-fpm-alpine
 LABEL maintainer "Michael Molchanov <mmolchanov@adyax.com>"
 
 # Install system dependencies
-RUN apk update \
-    && apk add --no-cache --virtual dev-deps git autoconf gcc g++ make linux-headers \
-    && apk add --no-cache \
+RUN apk add --update --no-cache \
+    autoconf \
     bash \
     curl \
     freetype-dev \
+    g++ \
+    gcc \
+    git \
     icu-dev \
     imap-dev \
     libjpeg-turbo-dev \
@@ -18,6 +20,8 @@ RUN apk update \
     libxml2-dev \
     libxslt-dev \
     libzip-dev \
+    linux-headers \
+    make \
     mysql-client \
     oniguruma-dev \
     openldap-dev \
@@ -29,7 +33,7 @@ RUN apk update \
     tidyhtml-dev \
     && rm -rf /var/cache/apk/*
 
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted gnu-libiconv
+RUN apk add --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted gnu-libiconv
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 
 # Install php extensions
@@ -71,37 +75,39 @@ RUN wget https://getcomposer.org/installer \
     && rm installer \
     && composer global --no-progress --no-interaction require hirak/prestissimo
 
-WORKDIR /app
-
-COPY php.ini /usr/local/etc/php/conf.d/default.ini
-
-USER www-data
-
-ENV HOME /home/www-data
-ENV NVM_DIR $HOME/.nvm
-ENV PATH ${HOME}/.yarn/bin:${HOME}/.nvm/versions/node/${NODE_VERSION}/bin:${PATH}
+ENV NVM_DIR /usr/local/nvm
 
 # Profile
-RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.bashrc" \
-    && echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.bashrc" \
-    && echo '[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >> "$HOME/.bashrc"
+RUN echo 'export NVM_DIR="/usr/local/nvm"' >> /etc/profile.d/nvm.sh \
+    && echo '[ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh"  # This loads nvm' >> /etc/profile.d/nvm.sh \
+    && echo '[ -s "${NVM_DIR}/bash_completion" ] && . "${NVM_DIR}/bash_completion" # This loads nvm bash_completion' >> /etc/profile.d/nvm.sh
 
-RUN mkdir -p $NVM_DIR \
+RUN mkdir -p ${NVM_DIR} \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 
 ENV NODE_VERSION v12.21.0
+ENV PATH /usr/local/nvm/versions/node/${NODE_VERSION}/bin:${PATH}
 
 RUN source ${NVM_DIR}/nvm.sh \
     && nvm install -s ${NODE_VERSION} \
     && nvm alias default ${NODE_VERSION} \
-    && nvm use --delete-prefix default
+    && nvm use --delete-prefix default \
+    && rm -rf ${NVM_DIR}/.cache
 
 RUN source ${NVM_DIR}/nvm.sh \
-    && npm install -g gulp-cli grunt-cli bower \
-    && curl -o- -L https://yarnpkg.com/install.sh | bash \
+    && npm install -g yarn gulp-cli grunt-cli bower \
     && node --version \
     && npm --version \
     && grunt --version \
     && gulp --version \
     && bower --version \
     && yarn versions
+
+WORKDIR /app
+
+COPY php.ini /usr/local/etc/php/conf.d/default.ini
+
+USER www-data
+
+# Install prestissimo
+RUN composer global --no-progress --no-interaction require hirak/prestissimo
