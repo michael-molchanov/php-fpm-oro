@@ -67,10 +67,9 @@ RUN set -xeu \
 
 # Install composer
 RUN wget https://getcomposer.org/installer \
-    && php installer --install-dir=/usr/local/bin/ --filename=composer \
-    && rm installer
-    # https://github.com/coopcycle/coopcycle-web/issues/1853
-    # composer global --no-progress --no-interaction require hirak/prestissimo
+    && php installer --install-dir=/usr/local/bin/ --filename=composer --version=1.10.20 \
+    && rm installer \
+    && composer global --no-progress --no-interaction require hirak/prestissimo
 
 WORKDIR /app
 
