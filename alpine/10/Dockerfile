@@ -43,7 +43,7 @@ RUN set -xeu \
       redis \
     && docker-php-ext-enable xdebug \
     && docker-php-ext-enable redis \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc)  \
       bcmath \
       gd \

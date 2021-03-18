@@ -15,6 +15,7 @@ RUN apt-get update \
       default-mysql-client \
       git \
       libc-client-dev \
+      libcurl4-openssl-dev \
       libfreetype6-dev \
       libicu-dev \
       libjpeg-dev \
@@ -24,6 +25,7 @@ RUN apt-get update \
       libonig-dev \
       libpng-dev \
       libpq-dev \
+      libssl-dev \
       libtidy-dev \
       libxml2-dev \
       libxslt-dev \
@@ -32,6 +34,7 @@ RUN apt-get update \
       make \
       openssh-client \
       patch \
+      pkg-config \
       postgresql-client \
       unzip \
       wget \
@@ -45,8 +48,8 @@ RUN set -xeu \
       redis \
     && docker-php-ext-enable xdebug \
     && docker-php-ext-enable redis \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
-    && docker-php-ext-configure imap --with-kerberos=/usr/include/ --with-imap-ssl=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
+    && docker-php-ext-configure imap --with-kerberos=/usr/include/ --with-imap-ssl \
     && docker-php-ext-install -j$(nproc)  \
       bcmath \
       gd \
