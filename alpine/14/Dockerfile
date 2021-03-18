@@ -1,4 +1,4 @@
-FROM php:7.3.27-fpm-alpine
+FROM php:7.3.27-fpm-alpine3.13
 
 LABEL maintainer "Michael Molchanov <mmolchanov@adyax.com>"
 
