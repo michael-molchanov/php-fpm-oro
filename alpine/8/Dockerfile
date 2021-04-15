@@ -39,10 +39,12 @@ ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 # Install php extensions
 RUN set -xeu \
     && pecl install \
-      xdebug \
+      mongodb \
       redis \
-    && docker-php-ext-enable xdebug \
+      xdebug \
+    && docker-php-ext-enable mongodb \
     && docker-php-ext-enable redis \
+    && docker-php-ext-enable xdebug \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc)  \
       bcmath \
@@ -71,9 +73,10 @@ RUN set -xeu \
 
 # Install composer
 RUN wget https://getcomposer.org/installer \
-    && php installer --install-dir=/usr/local/bin/ --filename=composer --version=1.10.20 \
-    && rm installer \
-    && composer global --no-progress --no-interaction require hirak/prestissimo
+    && php installer --install-dir=/usr/local/bin/ --filename=composer --version=2.0.12 \
+    && rm installer
+
+RUN composer global --no-progress --no-interaction require symfony/flex
 
 ENV NVM_DIR /usr/local/nvm
 
@@ -109,5 +112,4 @@ COPY php.ini /usr/local/etc/php/conf.d/default.ini
 
 USER www-data
 
-# Install prestissimo
-RUN composer global --no-progress --no-interaction require hirak/prestissimo
+RUN composer global --no-progress --no-interaction require symfony/flex

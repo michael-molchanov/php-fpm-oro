@@ -41,10 +41,12 @@ RUN apt-get update \
 # Install php extensions
 RUN set -xeu \
     && pecl install \
-      xdebug \
+      mongodb \
       redis \
-    && docker-php-ext-enable xdebug \
+      xdebug \
+    && docker-php-ext-enable mongodb \
     && docker-php-ext-enable redis \
+    && docker-php-ext-enable xdebug \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-configure imap --with-kerberos=/usr/include/ --with-imap-ssl=/usr/include/ \
     && docker-php-ext-install -j$(nproc)  \
@@ -67,9 +69,10 @@ RUN set -xeu \
 
 # Install composer
 RUN wget https://getcomposer.org/installer \
-    && php installer --install-dir=/usr/local/bin/ --filename=composer --version=1.10.20 \
-    && rm installer \
-    && composer global --no-progress --no-interaction require hirak/prestissimo
+    && php installer --install-dir=/usr/local/bin/ --filename=composer --version=2.0.12 \
+    && rm installer
+
+RUN composer global --no-progress --no-interaction require symfony/flex
 
 # Install nodejs & grunt.
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
@@ -93,5 +96,4 @@ COPY php.ini /usr/local/etc/php/conf.d/default.ini
 
 USER www-data
 
-# Install prestissimo
-RUN composer global --no-progress --no-interaction require hirak/prestissimo
+RUN composer global --no-progress --no-interaction require symfony/flex
